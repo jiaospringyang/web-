@@ -1,0 +1,113 @@
+到底什么是JS原型
+
+话说在前头，去网上查询很多关于JS原型的解释的文章，其中有80%看了都会不知所云，大多数关于JS原型的解释的文章或者视频，都忽略了很多读者对一些专业名词、概念是不掌握的，或许你说的一句话，就可以绕晕读者，导致大家走了很多很多弯路。在这里先分享我查到的一篇关于JS原型的解释，是最通俗易懂的，地址。
+
+一、首先大家在对JS原型进行解释的时候，会涉及两个概念：构造函数、原型对象
+1.构造函数：通俗的一句话说，就是你在script标签里面声明的那个函数：
+
+<body>
+<script>
+    function students() {
+ 
+        /* 我就是构造函数 */
+ 
+ 
+    }
+ 
+ 
+ 
+</script>
+</body>
+2.原型对象：在声明了一个函数之后，浏览器会自动按照一定的规则创建一个对象，这个对象就叫做原型对象。这个原型对象其实是储存在了内存当中。
+
+3.在声明了一个函数后，这个构造函数（声明了的函数）中会有一个属性prototype，这个属性指向的就是这个构造函数（声明了的函数）对应的原型对象；原型对象中有一个属性constructor，这个属性指向的是这个构造函数（声明了的函数）。下面一张图可以很简单理解：
+
+
+
+二、使用构造函数创建对象
+我们的构造函数使用new来创建对象的时候，就像下面这样：
+
+<body>
+<script>
+    function students() {
+ 
+        /* 我就是构造函数 */
+ 
+ 
+    }
+ 
+    var stu = new students();
+ 
+</script>
+ 
+</body>
+此时，stu就是那个构造函数students创建出来的对象，这个stu对象中是没有prototype属性的，prototype属性只有在构造函数students中有。
+
+可以看出，构造函数students中有prototype属性，指向的是students对应的原型对象；而stu是构造函数students创建出来的对象，他不存在prototype属性，所以在调用prototype的时候的结构是undefined，但stu有一个__proto__属性，stu调用这个属性可以直接访问到构造函数students的原型对象（也就是说，stu的__proto__属性指向的是构造函数的原型对象）。
+
+
+
+说明（引用前面提到的文章的内容，因为很重要）：
+
+从上面的代码中可以看到，创建stu对象虽然使用的是students构造函数，但是对象创建出来之后，这个stu对象其实已经与students构造函数没有任何关系了，stu对象的__proto__属性指向的是students构造函数的原型对象。
+如果使用new students()创建多个对象stu1、stu2、stu3，则多个对象都会同时指向students构造函数的原型对象。
+我们可以手动给这个原型对象添加属性和方法，那么stu1,stu2,stu3…这些对象就会共享这些在原型中添加的属性和方法。
+如果我们访问stu中的一个属性name，如果在stu对象中找到，则直接返回。如果stu对象中没有找到，则直接去stu对象的__proto__属性指向的原型对象中查找，如果查找到则返回。(如果原型中也没有找到，则继续向上找原型的原型—原型链)。
+如果通过stu对象添加了一个属性name，则stu对象来说就屏蔽了原型中的属性name。 换句话说：在stu中就没有办法访问到原型的属性name了。
+通过stu对象只能读取原型中的属性name的值，而不能修改原型中的属性name的值。 stu.name = “李四”; 并不是修改了原型中的值，而是在stu对象中给添加了一个属性name。
+请看下面代码（在上面提到的文章中做了小幅度修改，更有助于理解）
+
+<body>
+    <script type="text/javascript">
+        function students () {        
+        }
+        // 可以使用students.prototype 直接访问到原型对象
+        //给students函数的原型对象中添加一个属性 name并且值是 "张三"
+        students.prototype.name = "张三";
+        students.prototype.age = 20;
+ 
+        var stu = new students();
+        /*
+            访问stu对象的属性name，虽然在stu对象中我们并没有明确的添加属性name，但是
+            stu的__proto__属性指向的原型中有name属性，所以这个地方可以访问到属性name
+            就值。
+            注意：这个时候不能通过stu对象删除name属性，因为只能删除在stu中删除的对象。
+        */
+        alert(stu.name);  // 张三
+ 
+        var stu1 = new students();
+        alert(stu1.name);  // 张三  都是从原型中找到的，所以一样。
+ 
+        alert(stu.name === stu1.name);  // true
+ 
+        // 由于不能修改原型中的值，则这种方法就直接在stu中添加了一个新的属性name，然后在stu中无法再访问到
+        //原型中的属性。
+        stu.name = "李四";
+        alert(stu.name); //李四
+        // 由于stu1中没有name属性，则对stu1来说仍然是访问的原型中的属性。    
+        alert(stu1.name);  // 张三  
+    </script>
+</body>
+三、与原型有关的几个方法
+1. prototype属性
+
+prototype 存在于构造函数中 (其实任意函数中都有，只是不是构造函数的时候prototype我们不关注而已) ，他指向了这个构造函数的原型对象。
+
+2.constructor属性
+
+ constructor属性存在于原型对象中，他指向了构造函数
+
+如下面代码：
+
+<script type="text/javascript">
+    function students () {
+    }
+    alert(students.prototype.constructor === students); // true
+</script>
+我们根据需要，可以students.prototype 属性指定新的对象，来作为students的原型对象。但是这个时候有个问题，新的对象的constructor属性则不再指向students构造函数了。
+
+3.__proto__ 属性(注意：左右各是2个下划线)
+
+​ 用构造方法创建一个新的对象之后，这个对象中默认会有一个属性__proto__, 这个属性就指向了构造方法的原型对象。
+
+到此为止，JS的原型的基础就是这些了，如果有看不懂的请直接评论在下面，有关于JS原型更深入的一些用法，实际用到的时候再进行分享。
