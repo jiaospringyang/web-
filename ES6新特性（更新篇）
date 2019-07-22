@@ -1,0 +1,299 @@
+ECMAScript 6.0（以下简称ES6）是JavaScript语言的下一代标准，已经在2015年6月正式发布了。它的目标，是使得JavaScript语言可以用来编写复杂的大型应用程序，成为企业级开发语言。
+
+ES6新增添很多功能。更加方便我们的使用功能，话不多少。进入主题。
+
+
+
+ES6新特性.png
+
+一、关于变量
+ES5
+1.只有全局作用域变量和函数作用域变量
+2.“变量提升”（当程序进入一个新的函数时，会将该函数中所有的变量的声明放在函数开始的位置。仅仅会提升变量的声明，不会提升变量的赋值）
+
+ES6新增：块级作用域变量
+1、let定义块级作用域变量
+
+1、没有变量的提升，必须先声明后使用
+2、let声明的变量，不能与前面的let，var，conset声明的变量重名
+
+    {   
+        {        //console.log(a)//报错  必须先声明再使用
+        let a = 10;//只在当前大括号可以使用
+        var b = "abc";//全局作用域变量
+        console.log(a);//10
+        //let a = 10//报错 Uncaught SyntaxError: Identifier 'a' has already been declared
+        console.log(b);//bac
+        }        console.log(b);//abc
+        // console.log(a);//报错 只能在大括号中使用
+    }
+2、const  定义只读变量
+
+1、const声明变量的同时必须赋值，const声明的变量必须初始化，一旦初始化完毕就不允许修改
+2、const声明变量也是一个块级作用域变量
+3、const声明的变量没有“变量的提升”，必须先声明后使用
+4、const声明的变量不能与前面的let， var ，  const声明的变量重名
+
+    {        const VERSION = "1.2.3"
+        console.log( VERSION )//也只能在括号里使用
+    }    //console.log( VERSION )//VERSION is not defined  报错  也是只读变量
+二、关于函数
+ES6可以给形参函数设置默认值
+就是说，当我们调用函数时，如果设置了默认形参，即使没给函数传入实参，那么函数的实参就是默认形参。
+
+function fun2(a=1,b=2){    console.log(a,b)//1,2}
+fun2(11,22);//11 22fun2(100);//100 2
+在构造函数中也可是使用的
+
+function Person(name,age,sex="男"){    this.name = name;    this.age = age;    this.sex = sex;
+}var p1 = new Person("张三",20);console.log(p1)// Person {name: "张三", age: 20, sex: "男"}var p2 = new Person("赵四",30);console.log(p2)// Person {name: "赵四", age: 30, sex: "男"}var p3 = new Person("翠花",20,"女");console.log(p3)// Person {name: "翠花", age: 20, sex: "女"
+箭头函数
+//正常函数var fun3 = function(a){    console.log(a);
+}//箭头函数var fun3 = (a)=>{console.log(a);}
+fun3(999);
+比如我们用箭头函数计算一个1到100的和
+
+var fun4 = ()=>{    var sum=0;    for(var i = 0; i<=100; i++){
+        sum = sum+i
+    }    return sum;
+}console.log(fun4());//1000
+var person = {    name:"tom",    sayHi:()=>{        console.log(this);//window对象
+        console.log("hello,everyone. my name is "+this.name);//hello,everyone. my name is window的name
+    }
+}
+person.sayHi();
+同时复习一下this的认识
+
+1.在函数体外，this指的就是window对象
+2.在函数替内，谁调用函数this就指向谁
+3.在构造函数中，this指的是新创建的对象
+4.在html标签中，this指的是当前的这个标签元素
+5.在ES6中，对于箭头函数，要看它在哪里创建的，和当前函数的作用域。
+
+三、关于数组的展开运算
+在数组之前加上三个点（...）
+
+var arr = [1,2,3,4,5];console.log(arr);//[1, 2, 3, 4, 5]console.log(...arr)// 1 2 3 4 5
+可以根据数组的展开运算用数组给函数批量的传参
+
+function fun5(a,b,c,d,e,f){    //如果没有展开数组，打印结果如下
+    //console.log(a,b,c,d,e,f)//[1, 2, 3, 4, 5] undefined undefined undefined undefined undefine
+    console.log(a,b,c,d,e,f)//11 22 33 44 55 66
+    //return a+b+c+d+e+f}//fun5([1,2,3,4,5])fun5(...[11,22,33,44,55,66])
+四、关于apply和call
+apply和call，都是对象本身没有某个属性或者方法，去引用其他对象的属性或方法，也就是说两者都可以改变this的属性
+
+不同之处
+
+apply(this的指向，数组/arguments)
+call(this的指向，参数1，参数2，参数3)
+
+var name ="window的name";var obj = {    name:"obj的name",    showName:function(v1,v2,v3){        console.log(v1,v2,v3)
+    }
+}
+obj.showName();
+obj.showName.apply(window,[10,20,30]);//10 20 30//apply括号里的是谁，调用的前面的函数里面的this就是谁obj.showName.call(window,10,20,30)//10  20  30
+var color = "yellow";function showColor(){    console.log(this.color)
+}var obj = {    color:"red",
+}
+showColor();//yellowshowColor.apply(obj);//redshowColor.call(obj);//redshowColor.apply(this);//yellowshowColor.call(window);//yellow
+五、关于解构赋值
+数组的解构赋值
+
+    var [a,b,c]=[11,22,33]    console.log(a,b,c)//11 22 33
+
+    var [e,[f,g],k] = [1,[2,3],5]    console.log(e,f,g,k)//1 2 3 5
+对象的解构赋值
+
+    var{name,age}={name:"张三",age:"20"}    console.log(name,age)//张三 20
+以前我们互换两个变量的值，需要借助第三个变量，利用解构赋值，就方便很多了
+
+    var f1 = 88;    var f2 = 99;
+    [f1,f2]=[f2,f1];    console.log(f1,f2)//99 88
+解构json
+
+    var jike = {"name":"tom","age":"23","sex":"男"};    var {name,age,sex}=jike;    console.log(name,age,sex)//tom 23 男
+
+    function cal(a,b){        var ret1 = a+b;        var ret2 = a-b;        var ret3 = a*b;        var ret4 = a/b;        return [ret1,ret2,ret3,ret4]
+    }    var [r1,r2,r3,r4] = cal(10,5);    console.log(r1,r2,r3,r4)//15 5 50 2
+六、string中加入include方法
+includes("字符"); 用于判断字符串中是否包含某个字符
+存在返回true 不存在返回false
+
+includes("字符",startIndex); 用于判断字符串中下标startIndex是否是某个字符
+是返回true  不是返回false
+
+var str = "hello";console.log( str.includes("e") )//trueconsole.log( str.includes("e",3) );//false
+七、创建对象
+ES5中创建对象的几种方法
+
+1.字面量法
+2.工厂模式
+3.构造函数
+4.组合方式   构造函数+原型模式
+
+ES6中创建对象
+
+class 类名{        //肯定存在一个构造函数
+        //如果不写构造函数，有一个默认的构造函数,内容为空
+    constructor(){}  //注意：这里不需要逗号
+        //下面是函数属性 比如属性有run  dark
+    run(){}
+    dark(){}
+}
+举个例子
+
+class Person{    //肯定存在一个构造函数
+    constructor(name,age,sex,nativePlace){        this.name=name;//注意：这里是分号
+        this.age=age;        this.sex=sex;        this.nativePlace=nativePlace;
+    }    //下面是函数属性
+    eat(){console.log("红烧排骨")}
+    study(){console.log("英文")}
+    play(){console.log("敲代码")}
+}var sunShine = new Person("fanfan","22","女","黑龙江");console.log(sunShine)//Person {name: "fanfan", age: "22", sex: "女", nativePlace: "黑龙江"}
+八、继承
+class Animal{    constructor(age,sex){        this.age = age;        this.sex = sex;
+    }
+    eat(){        console.log("吃吃吃")
+    }
+}class Dog extends Animal{    constructor(name,age,sex){        //super指的是父类，先调用父类的构造函数，然后再去添加属性
+        super(age,sex)        //console.log(super);//不能打印只能使用
+        this.name=name;
+    }
+    bark(){        console.log("哇哇哇")
+    }    //重写：在子类中重新定义父类中的方法
+    // eat(){
+    //  console.log("喝喝喝")
+    // }}var d = new Dog("妞妞","男",5)console.log(d)
+d.bark();
+d.eat();//ES6的继承，有两条继承链，构造函数  和  原型函数条  console.log( Dog.prototype)//Animal {}console.log( Dog.constructor==Animal.constructor)//trueconsole.log( Dog.prototype.__proto__==Animal.prototype)//true
+九、Set（）和Map（）
+set（）有序列表集合（没有重复）
+Set()是指有序列表集合 (set中的元素是没有重复的)
+
+set包含的方法
+add()、has()、delete()、clear()等
+
+add（）添加
+
+var s = new Set();
+s.add(1);
+s.add(window);
+s.add(true);
+s.add(1);console.log(s);//一共三个元素console.log(s.size)//数组的长度是3
+delete（value） 删除指定元素
+
+//结合上栗s.delete(window);
+console.log(s)   //1  trueconsole.log(s.size)   //2
+has( value )用来判断指定的值是否在set集合中
+存在返回true  不存在返回false
+
+//结合上栗console.log( s.has(1) )//true
+clear（） 同来清空set集合的
+
+//结合上栗s.clear()
+console.log(s)//此时为空
+举个例子：生成10个1-20的随机数，要求不可以重复
+
+var arr3 = new Set(); while(arr3.size<10){    var yuan = parseInt(Math.random() * (20 - 1 + 1) + 1);
+    arr3.add(yuan);     
+ } console.log(arr3)
+Map()  用来存放键值对的集合  key/value
+var map = new Map();map.set("name","张三");map.set("age",20);
+console.log(map)    //Map {"name" => "张三", "age" => 20}
+get(key)根据key值取得value
+
+console.log( map.get("name"))//张三
+has()  判断是否存在某个键值对
+存在返回true  不存在返回fasle
+
+console.log( map.has("age") ) //true
+ console.log( map.has("age1") ) //false
+clear() 清空集合
+
+ map.clear();
+console.log(map);//Map {}
+
+作者：ABOUTYOU
+链接：http://www.imooc.com/article/73454
+来源：慕课网
+
+ES6：
+内置对象新增API
+Array:
+Array.from()
+-- 将类数组对象转换为数组返回
+array.fill()
+-- 将数组元素填充指定值
+String:
+startsWith()
+-- 方法用来判断当前字符串是否是以另外一个给定的子字符串“开头”的
+endsWith()
+-- 方法用来判断当前字符串是否是以另外一个给定的子字符串“结尾”的
+Number:
+Number.parseInt()
+Number.parseFloat()
+    新增Map集合
+        用于存储 key-value 键值对
+            创建：new Map()
+            API：
+                Map.prototype.size -- 集合长度
+                Map.prototype.clear() -- 清空
+                Map.prototype.delete(key) -- 删除，根据 key 删除 key-value 映射
+                Map.prototype.entries() -- 返回所有的 key-value 映射
+                Map.prototype.forEach() -- 遍历迭代集合中每对 key-value
+                Map.prototype.get(key) -- 根据 key 获取对应的 value
+                Map.prototype.has(key) -- 判断集合中是否存在 key 所映射的 value
+                Map.prototype.keys() -- 返回所有键的集合
+                Map.prototype.set(key, value) -- 设置，向集合中保存 key-value 映射
+                Map.prototype.values() -- 返回所有值的集合
+
+    新增Set集合
+        用于存储各类型的唯一值，通常我们认为 Set 集合中的元素是无序的
+        创建：new Set();
+        API：
+            Set.prototype.size -- 长度
+            Set.prototype.add() -- 添加，保存元素
+            Set.prototype.clear() -- 清空
+            Set.prototype.delete() -- 删除
+            Set.prototype.entries() -- 集合
+            Set.prototype.forEach() -- 遍历
+            Set.prototype.has() -- 判断是否存在
+            Set.prototype.values() -- 所有值
+
+    for...of
+        for ... in
+
+    Symbol 符号
+
+    模板字符串
+        `hello 
+        ${exp}
+        world`
+
+    块级作用域
+        let 变量名 = 变量值;
+        const 变量名 = 变量值; -- 定义常量
+        没有声明提升
+        暂存死区
+            IIFE
+
+    箭头函数
+        是函数表达式的简写方式
+        箭头函数不会绑定自己的 this、arguments、super、new.target
+        箭头函数不能作为构造函数使用
+
+    解构赋值
+        var [a,b, ...c] = array;
+            -- 将数组中第一个元素赋值给变量a, 第二个元素赋值给变量 b，剩余元素（子数组）赋值给c
+        var {name, key, method} = object;
+            -- 将 object.name 属性值赋值给变量 name，将 object.key 属性值赋值给变量 key，将 object.method 属性值赋值给变量 method
+
+    ...
+        剩余参数
+        展开运算符
+
+作者：dwy_interesting
+链接：https://www.jianshu.com/p/196fd1ccaca8
+来源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
