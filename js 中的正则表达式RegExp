@@ -1,0 +1,472 @@
+1.1 RegExp对象实例的创建
+
+正则表达式模式：
+     g：表示全局模式，即模式将被用于整个字符串，而非发现第一个匹配项时立即停止；
+     i：表示不区分大小写，忽略https://github.com/jiaospringyang/web-大小写；
+     m：表示多行模式；
+所有元字符都必须转义，元字符：“(”、 “)”、 “[”、 “]”、 “{”、 “}”、 “\”、 “^”、 “$”、 “?”、 “*”、 “.”
+
+创建一个正则表达式可以：
+
+var expression1 = /pattern /flags ;
+var expression2 = new RegExp("pattern","flags");
+
+
+var exp1 = /[bc]at/i;
+var exp2 = new RegExp("[bc]at","i");   // 与exp1是等价的
+ 
+
+1.2 RegExp实例属性
+
+每个RegExp实例都具有以下属性：
+
+global：布尔值，表示是否设置了 g 标志；
+
+ignoreCase：布尔值，表示是否设置了 i 标志；
+
+lastIndex：正数，表示开始搜索下一个匹配项的字符位置，从0算起；
+
+multiline：布尔值，表示是否设置 m 标志；
+
+source：正则表达式的字符串表示，按照字面量形式而非传入构造函数的字符串模式返回，如：“[bc]at” ；
+
+ 
+
+1.3 正则表达式全部符号解释
+
+ 
+
+字符
+
+描述
+
+\
+
+将下一个字符标记为一个特殊字符、或一个原义字符、或一个 向后引用、或一个八进制转义符。例如，'n' 匹配字符 "n"。'\n' 匹配一个换行符。序列 '\\' 匹配 "\" 而 "\(" 则匹配 "("。
+
+^
+
+匹配输入字符串的开始位置。如果设置了 RegExp 对象的 Multiline 属性，^ 也匹配 '\n' 或 '\r' 之后的位置。
+
+$
+
+匹配输入字符串的结束位置。如果设置了RegExp 对象的 Multiline 属性，$ 也匹配 '\n' 或 '\r' 之前的位置。
+
+*
+
+匹配前面的子表达式零次或多次。例如，zo* 能匹配 "z" 以及 "zoo"。* 等价于{0,}。
+
++
+
+匹配前面的子表达式一次或多次。例如，'zo+' 能匹配 "zo" 以及 "zoo"，但不能匹配 "z"。+ 等价于 {1,}。
+
+?
+
+匹配前面的子表达式零次或一次。例如，"do(es)?" 可以匹配 "do" 或 "does" 中的"do" 。? 等价于 {0,1}。
+
+{n}
+
+n 是一个非负整数。匹配确定的 n 次。例如，'o{2}' 不能匹配 "Bob" 中的 'o'，但是能匹配 "food" 中的两个 o。
+
+{n,}
+
+n 是一个非负整数。至少匹配n 次。例如，'o{2,}' 不能匹配 "Bob" 中的 'o'，但能匹配 "foooood" 中的所有 o。'o{1,}' 等价于 'o+'。'o{0,}' 则等价于 'o*'。
+
+{n,m}
+
+m 和 n 均为非负整数，其中n <= m。最少匹配 n 次且最多匹配 m 次。例如，"o{1,3}" 将匹配 "fooooood" 中的前三个 o。'o{0,1}' 等价于 'o?'。请注意在逗号和两个数之间不能有空格。
+
+?
+
+当该字符紧跟在任何一个其他限制符 (*, +, ?, {n}, {n,}, {n,m}) 后面时，匹配模式是非贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。例如，对于字符串 "oooo"，'o+?' 将匹配单个 "o"，而 'o+' 将匹配所有 'o'。
+
+.
+
+匹配除 "\n" 之外的任何单个字符。要匹配包括 '\n' 在内的任何字符，请使用象 '[.\n]' 的模式。
+
+(pattern)
+
+匹配 pattern 并获取这一匹配。所获取的匹配可以从产生的 Matches 集合得到，在VBScript 中使用 SubMatches 集合，在JScript 中则使用 $0…$9 属性。要匹配圆括号字符，请使用 '\(' 或 '\)'。
+
+(?:pattern)
+
+匹配 pattern 但不获取匹配结果，也就是说这是一个非获取匹配，不进行存储供以后使用。这在使用 "或" 字符 (|) 来组合一个模式的各个部分是很有用。例如， 'industr(?:y|ies) 就是一个比 'industry|industries' 更简略的表达式。
+
+(?=pattern)
+
+正向预查，在任何匹配 pattern 的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如，'Windows (?=95|98|NT|2000)' 能匹配 "Windows 2000" 中的 "Windows" ，但不能匹配 "Windows 3.1" 中的 "Windows"。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。
+
+(?!pattern)
+
+负向预查，在任何不匹配 pattern 的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如'Windows (?!95|98|NT|2000)' 能匹配 "Windows 3.1" 中的 "Windows"，但不能匹配 "Windows 2000" 中的 "Windows"。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始
+
+x|y
+
+匹配 x 或 y。例如，'z|food' 能匹配 "z" 或 "food"。'(z|f)ood' 则匹配 "zood" 或 "food"。
+
+[xyz]
+
+字符集合。匹配所包含的任意一个字符。例如， '[abc]' 可以匹配 "plain" 中的 'a'。
+
+[^xyz]
+
+负值字符集合。匹配未包含的任意字符。例如， '[^abc]' 可以匹配 "plain" 中的'p'。
+
+[a-z]
+
+字符范围。匹配指定范围内的任意字符。例如，'[a-z]' 可以匹配 'a' 到 'z' 范围内的任意小写字母字符。
+
+[^a-z]
+
+负值字符范围。匹配任何不在指定范围内的任意字符。例如，'[^a-z]' 可以匹配任何不在 'a' 到 'z' 范围内的任意字符。
+
+\b
+
+匹配一个单词边界，也就是指单词和空格间的位置。例如， 'er\b' 可以匹配"never" 中的 'er'，但不能匹配 "verb" 中的 'er'。
+
+\B
+
+匹配非单词边界。'er\B' 能匹配 "verb" 中的 'er'，但不能匹配 "never" 中的 'er'。
+
+\cx
+
+匹配由 x 指明的控制字符。例如， \cM 匹配一个 Control-M 或回车符。x 的值必须为 A-Z 或 a-z 之一。否则，将 c 视为一个原义的 'c' 字符。
+
+\d
+
+匹配一个数字字符。等价于 [0-9]。
+
+\D
+
+匹配一个非数字字符。等价于 [^0-9]。
+
+\f
+
+匹配一个换页符。等价于 \x0c 和 \cL。
+
+\n
+
+匹配一个换行符。等价于 \x0a 和 \cJ。
+
+\r
+
+匹配一个回车符。等价于 \x0d 和 \cM。
+
+\s
+
+匹配任何空白字符，包括空格、制表符、换页符等等。等价于 [ \f\n\r\t\v]。
+
+\S
+
+匹配任何非空白字符。等价于 [^ \f\n\r\t\v]。
+
+\t
+
+匹配一个制表符。等价于 \x09 和 \cI。
+
+\v
+
+匹配一个垂直制表符。等价于 \x0b 和 \cK。
+
+\w
+
+匹配包括下划线的任何单词字符。等价于'[A-Za-z0-9_]'。
+
+\W
+
+匹配任何非单词字符。等价于 '[^A-Za-z0-9_]'。
+
+\xn
+
+匹配 n，其中 n 为十六进制转义值。十六进制转义值必须为确定的两个数字长。例如，'\x41' 匹配 "A"。'\x041' 则等价于 '\x04' & "1"。正则表达式中可以使用 ASCII 编码。.
+
+\num
+
+匹配 num，其中 num 是一个正整数。对所获取的匹配的引用。例如，'(.)\1' 匹配两个连续的相同字符。
+
+\n
+
+标识一个八进制转义值或一个向后引用。如果 \n 之前至少 n 个获取的子表达式，则 n 为向后引用。否则，如果 n 为八进制数字 (0-7)，则 n 为一个八进制转义值。
+
+\nm
+
+标识一个八进制转义值或一个向后引用。如果 \nm 之前至少有 nm 个获得子表达式，则 nm 为向后引用。如果 \nm 之前至少有 n 个获取，则 n 为一个后跟文字 m 的向后引用。如果前面的条件都不满足，若 n 和 m 均为八进制数字 (0-7)，则 \nm 将匹配八进制转义值 nm。
+
+\nml
+
+如果 n 为八进制数字 (0-3)，且 m 和 l 均为八进制数字 (0-7)，则匹配八进制转义值 nml。
+
+\un
+
+匹配 n，其中 n 是一个用四个十六进制数字表示的 Unicode 字符。例如， \u00A9 匹配版权符号 (?)。
+
+ 
+
+1.4 RegExp实例方法
+
+  1）exec()
+
+   该方法是专门为捕获组而设计的。exec() 接受一个参数，即要应用模式的字符串，然后返回包含第一个匹配项信息的数组；或者在没有匹配项的情况下返回null。返回的数组虽然是Array实例，但有连个额外的属性：index 和 input。其中 index 表示匹配项在字符串中的位置，而 input 表示应用正则表达式的字符串。在数组中第一项是与整个模式匹配的字符串，其他项是与模式中捕获组匹配的字符串（如果模式中没有捕获组，则该数组只包含一项）。
+
+复制代码
+    var text = "mom and dad and baby";
+    var pattern = /mom( and dad( and baby)?)?/gi;
+    
+    var matches = pattern.exec(text);
+    console.log(matches);// 0: "mom and dad and baby", 1: " and dad and baby", 2: " and baby", groups: undefined, index: 0, input: "mom and dad and baby", length: 3
+    console.log(pattern.lastIndex); // 20
+
+    matches = pattern.exec(text);
+    console.log(matches);    //null
+    console.log(pattern.lastIndex); // 0
+
+    text = "vat ,bat, sat, fat";
+    var pattern1 = /.at/;
+    
+    var matches = pattern1.exec(text);
+    console.log(matches.index);  //0
+    console.log(matches);  //0: "vat", groups: undefined, index: 0, input: "vat ,vat, sat, fat", length: 1
+    console.log(pattern1.lastIndex); //0
+    
+    matches = pattern1.exec(text);
+    console.log(matches.index);  //0
+    console.log(matches);  //0: "vat", groups: undefined, index: 0, input: "vat ,vat, sat, fat", length: 1
+    console.log(pattern1.lastIndex); //0
+    
+    var pattern2 = /.at/g;
+    
+    matches = pattern2.exec(text);
+    console.log(matches.index);  //0
+    console.log(matches);  //0: "vat", groups: undefined, index: 0, input: "vat ,vat, sat, fat", length: 1
+    console.log(pattern1.lastIndex);  //0
+    
+    matches = pattern2.exec(text);
+    console.log(matches.index);  //5
+    console.log(matches);  //0: "bat", groups: undefined, index: 5, input: "vat ,vat, sat, fat", length: 1
+    console.log(pattern1.lastIndex);  //0
+    
+    matches = pattern2.exec(text);
+    console.log(matches.index);  //10
+    console.log(matches);  //0: "sat", groups: undefined, index: 10, input: "vat ,vat, sat, fat", length: 1
+    console.log(pattern1.lastIndex);  //0
+复制代码
+exec() 方法，即使模式设置了全局表示（g），它每次返回也只是一个匹配项。没有设置全局标志，同一个字符串调用多次 exec() 始终返回第一个匹配项的信息。而设置了全局标志，每次调用 exec() 都会在字符串中基础查找新匹配项。 
+
+  2）test()
+
+该方法接受一个字符串参数，在模式与改参数匹配的情况下返回 true ，否则返回 false。很适用于只想知道目标字符串与否与某个模式匹配，但不许要知道其内容的情况。
+
+var text = "000-00-000";
+var pattern = /\d{3}-\d{2}-\d{3}/;
+if(pattern.test(text)){    //true
+    console.log("the pattern was matched!"); // 执行语句
+}
+1.5 RegExp对象的静态属性
+
+静态属性是RegExp这个内置对象的固有属性。访问这些静态属性，不需要进行声明实例化，而是直接调用。
+调用格式：RegExp.attribute
+
+下面所有属性的说明，就以：
+
+var desc = 'Hello,everyone.My name is gtshen';
+
+reg = /na(.?)/g;
+
+reg.test(desc);
+
+　　　　　　这段代码测试为例，进行说明：
+
+　　　　　　- input 
+　　　　　　　　功能：返回当前要匹配的字符串
+　　　　　　　　示例： console.log('input:'+RegExp.input) // -> 'Hello,everyone.My name is gtshen' 
+　　　　　　　　短名：RegExp.$_;
+　　　　　　　　注意：opera 低版本并不支持。
+
+　　　　　　- lastMatch 
+　　　　　　　　功能：最后一次匹配到的匹配项，需要开启修饰符-g。
+　　　　　　　　示例： console.log('lastMatch:'+RegExp.lastMatch) // -> nam 
+　　　　　　　　短名：RegExp['$&'];
+　　　　　　　　注意：opera 低版本并不支持。
+
+　　　　　　- lastParen 
+　　　　　　　　功能：最后一次匹配的捕获组。需要开启修饰符-g。
+　　　　　　　　示例： console.log('lastParen:'+RegExp.lastParen) // -> 'm'; 
+　　　　　　　　短名：RegExp['$+'];
+　　　　　　　　注意：opera 低版本并不支持。
+
+　　　　　　- leftContext
+　　　　　　　　功能：以当前匹配到的子串为上下文，返回之前的子串。
+　　　　　　　　示例： console.log('leftContext:'+RegExp.leftContext) // -> 'Hello,everyone.My '; 
+　　　　　　　　短名：RegExp['$&`'];
+
+　　　　　　- rightContext
+　　　　　　　　功能：以当前匹配到的子串为上下文，返回之后的子串。
+　　　　　　　　示例： console.log('rightContext:'+RegExp.rightContext) // -> 'e is gtshen'; 
+　　　　　　　　短名：RegExp['$\''];
+
+　　　　　　- multiline
+　　　　　　　　功能：是否支持多行。返回值为boolean值，true表示支持，false表示不支持。
+　　　　　　　　示例： console.log('multiline:'+RegExp.multiline); 
+　　　　　　　　短名：RegExp['$*'];
+　　　　　　　　注意：IE 并不支持。
+
+　　　　　　- $1 - $9 
+　　　　　　　　功能：返回1 - 9个捕获组的值。
+　　　　　　　　示例： console.log('$1:'+ RegExp.$1) // -> 'm' 
+
+　　　　　　* 注意的是“RegExp”指的是最近一次在程序运行中进行匹配操作的正则实例对象。
+
+ 
+
+2、String 中的正则
+
+1）match()
+
+match() 接受一个正则表达式作为参数。当正则表达式不具有全局属性 g ，该方法和 RegExp 的 exec() 方法执行结果一样，如正则有全局标志 g 时，返回一个包含所有匹配项的纯数组。
+
+格式：str.match(pattern)
+功能：
+　　match 在功能上与正则对象自带的方法exec很类似。
+　　match 根据匹配规则pattern匹配指定的字符串str，如果匹配成功则返回一个数组格式的结果用于存放匹配文本有关的信息，如果没有匹配到则返回null。
+
+复制代码
+var text = "mom and dad and baby";
+var pattern = /mom( and dad( and baby)?)?/i;
+
+var matches = text.match(pattern);
+console.log(matches);// 0: "mom and dad and baby", 1: " and dad and baby", 2: " and baby", groups: undefined, index: 0, input: "mom and dad and baby", length: 3
+console.log(pattern.lastIndex); // 20
+
+var pattern = /mom( and dad( and baby)?)?/gi;
+matches = text.match(pattern);
+console.log(matches);// ["mom and dad and baby"]
+console.log(pattern.lastIndex); // 0
+
+text = "vat ,bat, sat, fat";
+pattern = /.at/;
+
+//与 pattern.exec(text) 相同
+matches = text.match(pattern);
+console.log(matches);  //0: "vat", groups: undefined, index: 0, input: "vat ,vat, sat, fat", length: 1
+console.log(pattern.lastIndex); //0
+
+
+//如果match的匹配规则具有全局g属性，那么match返回的匹配结果，便是一个包含所有匹配结果的纯数组
+pattern = /.at/g;
+matches = text.match(pattern);
+console.log(matches);  //["vat", "bat", "sat", "fat"]
+console.log(pattern.lastIndex); //0
+复制代码
+2）search()
+
+该方法接受一个正则表达式或者字符串作为参数，从字符串开头向后查找。
+
+格式：str.search(pattern)；
+
+功能：根绝匹配规则pattern在字符串中检索指定的结果，如果检索到则返回该结果首字母在原字符中的索引，否则返回-1。其功能类似于indexOf，只是indexOf并不支持正则匹配。
+
+ 
+
+该方法忽略全局修饰符g，也不支持lastIndex也就是意味着它不能被多次调用，一旦检索到结果，便会停止检索。
+
+var text = "vat ,bat, sat, fat";
+var pattern = /at/;
+
+var pos = text.search(pattern);
+console.log(pos);  // 1
+  console.log( text.search("t") ); // 2
+ 3）replace()
+
+格式：str.replace(pattern,given)
+
+功能：根据匹配规则pattern来用指定的内容given去替换str或其部分字符。其中pattern可以是str中的部分字符也可以是一个正则表达式。
+
+ pattern 可以是字符串，也可以是正则表达式；given所代表替换的指定内容，既可以是字符串，也可以是一个回调函数。
+
+replace() 方法只会返回原字符被操作后的副本，并不会对原字符串进行改动。
+
+如果 pattern 是字符串，那么只会替换第一个匹配的子字符串。要想替换所有匹配的子串，需要 pattern 是正则表达式，且带全局标志 g。
+
+复制代码
+var text = "cat ,bat, sat, fat";
+var pattern = "at";
+
+var result = text.replace(pattern,"ond");
+console.log(result);  // "cond ,bat, sat, fat"
+
+pattern = /at/g;
+result = text.replace(pattern,"ond"); 
+console.log(result); //"cond ,bond, sond, fond"
+
+var str = '世界上最遥远的距离 不是生与死的距离 而是我就站在你的面前 你却不知道我爱你。',
+ st = ['死','爱','距离'],
+ pattern = '',
+ alt = '',
+ str1= "";
+
+for(var i=0;i<st.length;i++){
+
+    pattern = new RegExp(st[i],'g');
+    for(var j=0;j<st[i].length;j++){
+        alt+='*';
+    }
+
+    str1 = str.replace(pattern,alt);
+    alt = '';
+}
+
+console.log(str); //世界上最遥远的距离 不是生与死的距离 而是我就站在你的面前 你却不知道我爱你。
+console.log(str1); //世界上最遥远的** 不是生与*的** 而是我就站在你的面前 你却不知道我*你。
+复制代码
+ 
+
+given若是回调函数
+
+在只有一个匹配项，即没有捕获组的情况下，
+
+其格式为：  function(match,index,input){}。
+
+如果有多个捕获组，
+
+其格式为：  function(match,[$1...$9],index,input){}。
+
+ match：  表示当前匹配的结果
+ [$1 - $9]： 存在分组的情况下，表示当前 1 - 9 个分组的内容。
+ index： 当前匹配内容首字母在字符创中索引。
+ input ：进行匹配的原字符创。
+
+复制代码
+function htmlEscape(text){
+    return text.replace(/[<>"&]/g,function(match,index,input){
+        switch(match){
+            case "<": return "&lt;";
+            case ">": return "&gt;";
+            case "&": return "&amp;";
+            case "\"": return "&quot;";
+        }
+    });
+}
+console.log(htmlEscape("<p class=\"greeting\">Hello world!</p>"));// &lt;p class=&quot;greeting&quot;&gt;Hello world!&lt;/p&gt;
+
+var str = '2016/10/29';
+var pattern = /(\d+)(\/)/g;
+var data = str.replace(pattern,function(result,$1,$2){
+    return $1+'.';
+});
+console.log(data); //2016.10.29
+console.log(str.replace(pattern,"$1.")); //2016.10.29
+console.log(str.replace(/\//g,".")); //2016.10.29
+复制代码
+4）split()
+
+格式：str.split(pattern,length)
+功能：
+　   根据规则 pattern 将字符串拆分为数组，拆分后的数组并不包含作为拆分依据的那个参数。
+　   默认情况下是空字符进行拆分，也就是每个任意的字符作为一个数组元素。
+　　pattern参数，可以是正则表达式，也可以是单纯的字符或字符串。
+　　length参数，用于设置拆分数组后数组最大的长度（即数组元素的个数）。缺省该项，表示将字符全部拆分为数组。
+
+var str = 'hellow world!';
+console.log(str.split('')); //  ["h", "e", "l", "l", "o", "w", " ", "w", "o", "r", "l", "d", "!"]
+console.log(str.split('',5)); // ["h", "e", "l", "l", "o"]
+console.log(str.split(/o/g)); //  ["hell", "w w", "rld!"]
